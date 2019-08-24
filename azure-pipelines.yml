@@ -35,12 +35,12 @@ steps:
 - powershell: |
    $PfxFilePath= $Env:PFXFILE
    
-   $absolutePfxFilePath = Resolve-Path -Path $PfxFilePath
+   $absolutePfxFilePath = Resolve-Path -Path $(signingCert.secureFilePath)
    Write-Output "Importing store certificate '$absolutePfxFilePath'..."
    
    Add-Type -AssemblyName System.Security
    $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
-   $cert.Import($absolutePfxFilePath, $Env:PASSWORD, [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]"PersistKeySet")
+   $cert.Import($absolutePfxFilePath, $(CertPassword), [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]"PersistKeySet")
    $store = new-object system.security.cryptography.X509Certificates.X509Store -argumentlist "MY", CurrentUser
    $store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::"ReadWrite")
    $store.Add($cert)
