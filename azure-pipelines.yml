@@ -1,5 +1,9 @@
+trigger:
+- master
+
 pool:
-  name: Azure Pipelines
+  vmImage: 'windows-latest'
+
 steps:
 - script: |
    echo 'Clone Pengwin repository azure_pipelines branch'
@@ -67,4 +71,3 @@ steps:
   inputs:
     PathtoPublish: '$(build.artifactstagingdirectory)'
   condition: succeededOrFailed()
-
