@@ -8,13 +8,12 @@ steps:
 - script: |
    echo 'Clone Pengwin repository azure_pipelines branch'
    git clone -b azure_pipelines https://github.com/WhitewaterFoundry/Pengwin $(System.DefaultWorkingDirectory)\Pengwin
-   
   displayName: 'Clone Pengwin repository to working folder '
 
 - task: DownloadGitHubRelease@0
   displayName: 'Download Pengwin rootfs images to working folder'
   inputs:
-    connection: 'Github Connection'
+    connection: 'github connection'
     userRepository: 'WhitewaterFoundry/pengwin-rootfs-builds'
     itemPattern: '*.tar.gz'
     downloadPath: '$(System.DefaultWorkingDirectory)'
@@ -28,6 +27,7 @@ steps:
   displayName: 'Move rootfs images into place'
 
 - task: DownloadSecureFile@1
+  name: signingCert
   displayName: 'Download signing key from secure file'
   inputs:
     secureFile: StoreKey.pfx
@@ -35,17 +35,16 @@ steps:
 - powershell: |
    $PfxFilePath= $Env:PFXFILE
    
-   $absolutePfxFilePath = Resolve-Path -Path $(signingCert.secureFilePath)
+   $absolutePfxFilePath = Resolve-Path -Path $PfxFilePath
    Write-Output "Importing store certificate '$absolutePfxFilePath'..."
    
    Add-Type -AssemblyName System.Security
    $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
-   $cert.Import($absolutePfxFilePath, $(CertPassword), [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]"PersistKeySet")
+   $cert.Import($absolutePfxFilePath, $Env:PASSWORD, [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]"PersistKeySet")
    $store = new-object system.security.cryptography.X509Certificates.X509Store -argumentlist "MY", CurrentUser
    $store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::"ReadWrite")
    $store.Add($cert)
    $store.Close()
-   
   displayName: 'Import signing key into build user'
   env:
     PASSWORD: $(CertPassword)
