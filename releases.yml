@@ -1,0 +1,7 @@
+steps:
+- task: MS-RDX-MRO.windows-store-publish.publish-task.store-publish@0
+  displayName: 'Publish $(SYSTEM_DEFAULTWORKINGDIRECTORY)/$(RELEASE_PRIMARYARTIFACTSOURCEALIAS)/drop/**/*.appxbundle'
+  inputs:
+    serviceEndpoint: Pengwin
+    appId: 9NV1GV1PXZ6P
+    packagePath: '$(SYSTEM_DEFAULTWORKINGDIRECTORY)/$(RELEASE_PRIMARYARTIFACTSOURCEALIAS)/drop/**/*.appxbundle'
